@@ -1,0 +1,38 @@
+name: Lint
+
+on:
+  # Replace pull_request with pull_request_target if you
+  # plan to use this action with forks, see the Limitations section
+  pull_request:
+    branches:
+      - master
+      - test
+
+# Down scope as necessary via https://docs.github.com/en/actions/security-guides/automatic-token-authentication#modifying-the-permissions-for-the-github_token
+permissions:
+  checks: write
+  contents: write
+
+jobs:
+  run-linters:
+    name: Run linters
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Install Node.js dependencies
+        run: npm ci
+
+      - name: Run FE linters
+        run: npm run fe-game:lint
+
+      - name: Run FE-Account linters
+        run: npm run fe-accounts:lint
+
+      - name: Run BE linters
+        run: npm run be-game:lint
+
+      - name: Run BE-Account linters
+        run: npm run be-accounts:lint

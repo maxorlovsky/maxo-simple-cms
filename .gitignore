@@ -1,0 +1,12 @@
+*.log
+/node_modules
+.env
+
+# Frontend
+/ui/public/*
+/ui/node_modules
+/ui/vite.config.ts.timestamp-*
+
+# Backend
+/api/public/*
+/api/ormconfig*.json

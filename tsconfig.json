@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@shared/*": ["shared/*"],
+        },
+        "outDir": "./dist",
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+    },
+    "exclude": [
+        "./node_modules",
+        "./scripts",
+        "./ui/vite.config.ts",
+        "./ui/node_modules",
+        "./ui/public",
+        "./ui/src/**/*.json",
+        "./api/public",
+        "./api/node_modules",
+        "./api/src/**/*.json",
+    ]
+}

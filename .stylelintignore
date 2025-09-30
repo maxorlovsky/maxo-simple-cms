@@ -1,0 +1,5 @@
+*.css
+*.js
+/ui/src/index.html
+/ui/public/index.html
+/api

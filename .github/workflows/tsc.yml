@@ -1,0 +1,29 @@
+name: TypeScript compilation
+
+on:
+  pull_request:
+    branches:
+      - master
+      - test
+
+permissions:
+  checks: write
+  contents: write
+
+jobs:
+  tsc:
+    name: TypeScript Compiler
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+      - name: Install Node.js dependencies
+        run: npm ci
+      - name: Run TSC in FE folder
+        run: cd fe-game && npm run tsc
+      - name: Run TSC in FE-Account folder
+        run: cd fe-accounts && npm run tsc
+      - name: Run TSC in BE folder
+        run: cd be-game && cp .ormconfig.json ormconfig.json && cp .ormconfig.json ormconfig-accounts.json && tsc
+      - name: Run TSC in BE-Accounts folder
+        run: cd be-accounts && cp .ormconfig.json ormconfig.json && tsc
