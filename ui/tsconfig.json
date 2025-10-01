@@ -1,0 +1,62 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "baseUrl": ".",
+    "rootDirs": [
+      "..",
+      "shared"
+    ],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.iterable",
+    ],
+    "target": "ES2022",
+    "module": "ES2022",
+    "outDir": "./public",
+    "paths": {
+      "@src/*": ["src/*"],
+      "@inc/*": ["src/inc/*"],
+      "@pages/*": ["src/pages/*"],
+      "@components/*": ["src/components/*"],
+      "@utils/*": ["src/utils/*"],
+      "@shared/*": ["../shared/*"],
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strictNullChecks": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types"
+    ],
+    "resolveJsonModule": true,
+    "ignoreDeprecations": "5.0",
+    "useDefineForClassFields": true,
+
+    /* Bundler mode */
+    "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "preserve",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": [
+    "./src/**/*.ts",
+    "./src/**/*.vue"
+  ],
+  "exclude": []
+}

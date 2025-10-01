@@ -28,6 +28,13 @@ module.exports = [
             },
         },
         rules: {
+            'padding-line-between-statements': [
+                'error',
+                { blankLine: 'always', prev: ['const', 'let'], next: '*' },
+                { blankLine: 'any',    prev: ['const', 'let'], next: ['const', 'let'] },
+                // require a blank line before any `if` statement
+                { blankLine: 'always', prev: '*', next: 'if' }
+            ],
             '@typescript-eslint/explicit-member-accessibility': 'off',
             '@typescript-eslint/array-type': 'off',
             '@typescript-eslint/ban-ts-ignore': 'off',
@@ -53,11 +60,11 @@ module.exports = [
                 ignoreComments: false
             }],
             'vue/html-indent': [
-                'error', 4, {
+                'error', 2, {
                     'attribute': 1,
                     'closeBracket': 0,
-                    'alignAttributesVertically': true,
-                    'ignores': ['VAttribute']
+                    // don't align attributes vertically; require fixed indent relative to the tag
+                    'alignAttributesVertically': false
                 }
             ],
             'vue/multiline-html-element-content-newline': 'off',
@@ -70,7 +77,7 @@ module.exports = [
             ],
             'vue/multi-word-component-names': 'off',
             'vue/no-v-html': 'off',
-            'indent': ['error', 4, {
+            'indent': ['error', 2, {
                 SwitchCase: 1
             }],
         },

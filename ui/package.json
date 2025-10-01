@@ -1,0 +1,11 @@
+{
+  "name": "ui",
+  "type": "module",
+  "scripts": {
+    "eslint": "eslint --config ../eslint.config.js --ext vue,ts \"src/**\"",
+    "tsc": "vue-tsc",
+    "ui": "vite",
+    "build": "tsc && vite build"
+  },
+  "devDependencies": {}
+}

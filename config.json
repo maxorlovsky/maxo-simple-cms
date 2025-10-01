@@ -1,0 +1,10 @@
+{
+    "title": "test-panel",
+    "version": "1.0.0",
+    "multiBrands": false,
+    "maxLevel": 3,
+    "logs": {
+        "modules": [],
+        "types": []
+    }
+}

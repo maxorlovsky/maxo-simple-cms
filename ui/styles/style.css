@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+body {
+  background-image: url('/assets/images/tree.png');
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-color: #eee;
+}
