@@ -2,12 +2,12 @@
 import { Request } from 'express';
 
 // Interfaces
-import { AdminInterface } from './interfaces/admins';
+import { AdminInterface } from './admins';
 
 export interface RequestInterface extends Request {
     isLogged: boolean;
     siteId: number;
-    user: AdminInterface;
-    file: Array<string>;
-    files: Array<Array<string>>;
+    user?: AdminInterface;
+    file?: string[];
+    files?: string[][];
 }

@@ -3,12 +3,12 @@ import { MoAdmins } from './moAdmins';
 
 @Entity()
 export class MoUsersAuth {
-
     @PrimaryGeneratedColumn()
     id: number;
 
-    // eslint-disable-next-line
-    @OneToOne(type => MoAdmins)
+    @OneToOne(type => MoAdmins, admin => admin.id, {
+      onDelete: 'CASCADE'
+    })
     @JoinColumn()
     user: MoAdmins;
 

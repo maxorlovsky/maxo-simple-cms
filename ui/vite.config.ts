@@ -32,18 +32,12 @@ export default defineConfig({
     port: 8500,
     strictPort: true,
     proxy: {
-      '/api': {
-        target: `https://localhost:8525/public`,
+      '/maxo-simple-cms-api': {
+        target: `http://app:8525/`,
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        rewrite: (path) => path.replace(/^\/maxo-simple-cms-api/, ''),
       },
-      '/private-api': {
-        target: `https://localhost:8525/private`,
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/private-api/, ''),
-      }
     }
   },
   plugins: [

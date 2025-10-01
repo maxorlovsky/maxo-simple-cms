@@ -6,3 +6,4 @@ public/ormconfig.json
 
 # Exclude config, to not expose database connection in git
 ormconfig.json
+/generated/prisma

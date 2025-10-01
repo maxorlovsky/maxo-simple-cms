@@ -1,0 +1,31 @@
+services:
+  app:
+    image: node:22
+    working_dir: /app
+    volumes:
+      - .:/app
+    environment:
+      DB_HOST: mariadb
+      DB_USER: root
+      DB_PASSWORD: rootpassword
+      DB_NAME: cms_db
+    command: sh ./init/entrypoint.sh
+    depends_on:
+      - mariadb
+    ports:
+      - "8500:8500"
+
+
+  mariadb:
+    image: mariadb:11
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+    volumes:
+      - maxo_simple_cms_mariadb_data:/var/lib/mysql
+      - ./init:/docker-entrypoint-initdb.d
+    ports:
+      - "3306:3306"
+
+volumes:
+  maxo_simple_cms_mariadb_data:

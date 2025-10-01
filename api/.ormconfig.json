@@ -1,25 +1,20 @@
 {
-    "env": "dev",
     "type": "mariadb",
-    "host": "",
+    "host": "mariadb",
     "port": 3306,
-    "username": "",
-    "password": "",
-    "database": "",
+    "username": "root",
+    "password": "rootpassword",
+    "database": "cms_db",
     "synchronize": true,
     "logging": false,
     "entities": [
         "db/entity/**/*"
     ],
     "migrations": [
-        "db/migration/**/*"
-    ],
-    "subscribers": [
-        "db/subscriber/**/*"
+        "./api/db/migration/**/*"
     ],
     "cli": {
         "entitiesDir": "db/entity",
-        "migrationsDir": "db/migration",
-        "subscribersDir": "db/subscriber"
+        "migrationsDir": "./api/db/migration"
     }
 }

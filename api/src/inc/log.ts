@@ -1,40 +1,27 @@
-import { getConnection } from 'typeorm';
+// 3rd party libs
 import { address } from 'ip';
 
-// Entities
-import { MoLogs } from '../../db/entity/moLogs';
+// Inc
+import { prisma } from '@inc/db';
 
-export async function log(log: LogInterface): Promise<boolean> {
-    if (!log.userId) {
-        log.userId = null;
+export async function log(log: {
+    userId?: number,
+    module?: string,
+    type?: string,
+    info?: string,
+}): Promise<boolean> {
+  log.module = (log.module || '').toLowerCase();
+
+  await prisma.mo_logs.create({
+    data: {
+      module: log.module || '',
+      type: log.type || '',
+      date: new Date(),
+      ip: address(),
+      info: log.info || '',
+      userId: log.userId ?? null
     }
+  });
 
-    if (!log.module) {
-        log.module = '';
-    }
-    log.module = log.module.toLowerCase();
-
-    if (!log.type) {
-        log.type = '';
-    }
-
-    const newLog = new MoLogs();
-
-    newLog.module = log.module;
-    newLog.type = log.type;
-    newLog.date = new Date();
-    newLog.ip = address();
-    newLog.info = log.info;
-    newLog.userId = log.userId;
-
-    await getConnection().getRepository(MoLogs).save(newLog);
-
-    return true;
-}
-
-interface LogInterface {
-    userId: number | null;
-    module: string | null;
-    type: string | null;
-    info: string;
+  return true;
 }

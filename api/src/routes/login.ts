@@ -1,62 +1,66 @@
 // 3rd party libs
-import * as express from 'express';
-
-// Config
-import * as config from '../inc/config.json';
+import express from 'express';
 
 // Logger
-import { log } from '../inc/log';
+import { log } from '@inc/log';
 
 // Modules
-import Login from '../modules/login';
+import LoginModule from '../modules/login';
+
+// Helpers
+import { sanitizeString } from '@src/helpers/sanitize';
 
 // Interfaces
-import { RequestInterface } from '../routing-interfaces';
+import type { RequestInterface } from '@shared/interfaces/routing';
+import type { LoginRequestInterface, LoginResponseInterface } from '@shared/interfaces/login';
 
 // Define router
 const router: express.Router = express.Router();
+const loginModule = new LoginModule();
 
-router.post('/login', async (req: RequestInterface, res: express.Response): Promise<boolean> => {
-    // In case user is already authorized, we ignore login endpoint
-    if (req.isLogged) {
-        res.status(405).json({ message: 'Already authorized' });
+router.post('/login', async (req: RequestInterface, res: express.Response): Promise<void> => {
+  // In case user is already authorized, we ignore login endpoint
+  if (req.isLogged) {
+    res.status(405).json({
+      status: false,
+      message: 'Already authorized'
+    });
+  }
 
-        return false;
-    }
+  const attributes: LoginRequestInterface = {
+    login: sanitizeString(req.body.login),
+    password: sanitizeString(req.body.password),
+  };
+  const response = await loginModule.login(attributes);
 
-    const attributes = {
-        login: req.body.login.toString(),
-        password: req.body.password.toString()
-    };
-
-    // Define controller, fill up main variables
-    const login = new Login(config.availableLoginAttempts);
-
-    // Authenticating user and in case of success return token
-    const checkUser = await login.login(attributes);
-
-    if (!checkUser) {
-        res.status(400).json({ message: login.getMessage() });
-
-        await log({
-            userId: null,
-            module: 'login',
-            type: 'fail',
-            info: `Error login as <b>${attributes.login}</b> (${login.getMessage()})`
-        });
-
-        return false;
-    }
+  if (response.status) {
+    // Passing session token to the user
+    res.status(200).json({
+      status: true,
+      sessionToken: response.sessionToken
+    } as LoginResponseInterface);
 
     await log({
-        userId: null,
-        module: 'login',
-        type: 'success',
-        info: `Success login as <b>${attributes.login}</b>`
+      userId: null,
+      module: 'login',
+      type: 'success',
+      info: `Success login as <b>${attributes.login}</b>`
     });
 
-    // Passing session token to the user
-    res.status(200).json({ sessionToken: checkUser });
+    return;
+  }
+
+  res.status(400).json({
+    status: false,
+    message: response.message
+  } as LoginResponseInterface);
+
+  await log({
+    userId: null,
+    module: 'login',
+    type: 'fail',
+    info: `Error login as <b>${attributes.login}</b> (${response.message})`
+  });
 });
 
 export default router;

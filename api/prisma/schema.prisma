@@ -1,0 +1,78 @@
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../generated/prisma"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model mo {
+  id      Int    @id @default(autoincrement())
+  setting String @db.VarChar(255)
+  value   String @db.Text
+}
+
+model mo_admins {
+  id            Int            @id @default(autoincrement())
+  login         String         @db.VarChar(100)
+  password      String         @db.VarChar(100)
+  level         Int            @default(1) @db.UnsignedTinyInt
+  customAccess  String         @db.Text
+  lastLogin     DateTime?      @db.DateTime(0)
+  lastIp        String?        @db.VarChar(40)
+  deleted       Int            @default(0) @db.UnsignedTinyInt
+  mo_users_auth mo_users_auth?
+}
+
+model mo_labels {
+  id      Int    @id @default(autoincrement())
+  siteId  Int    @default(0) @db.UnsignedSmallInt
+  name    String @db.VarChar(100)
+  output  String @db.Text
+  deleted Int    @default(0) @db.UnsignedTinyInt
+}
+
+model mo_logs {
+  id     Int       @id @default(autoincrement())
+  module String?   @db.VarChar(100)
+  type   String?   @db.VarChar(100)
+  userId Int?
+  date   DateTime? @db.DateTime(0)
+  ip     String?   @db.VarChar(40)
+  info   String?   @db.VarChar(500)
+}
+
+model mo_multisite {
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(100)
+}
+
+model mo_pages {
+  id              Int     @id @default(autoincrement())
+  siteId          Int     @default(0) @db.UnsignedSmallInt
+  title           String  @db.VarChar(100)
+  metaTitle       String? @db.VarChar(70)
+  metaDescription String? @db.VarChar(230)
+  link            String  @db.VarChar(300)
+  text            String? @db.Text
+  enabled         Int     @default(0) @db.UnsignedTinyInt
+  deleted         Int     @default(0) @db.UnsignedTinyInt
+}
+
+model mo_users_auth {
+  id        Int        @id @default(autoincrement())
+  token     String     @db.VarChar(100)
+  timestamp DateTime   @db.DateTime(0)
+  userId    Int?       @unique(map: "REL_0744169ab728cd4edcf1d57250")
+  mo_admins mo_admins? @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_0744169ab728cd4edcf1d57250e")
+}
+
+model mo_users_auth_attempts {
+  id        Int      @id @default(autoincrement())
+  ip        String   @db.VarChar(40)
+  timestamp DateTime @db.DateTime(0)
+  attempts  Int      @default(0) @db.UnsignedTinyInt
+}

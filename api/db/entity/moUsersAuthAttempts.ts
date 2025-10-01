@@ -1,10 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
-import { type } from "os";
-import { text } from "body-parser";
 
 @Entity()
 export class MoUsersAuthAttempts {
-
     @PrimaryGeneratedColumn()
     id: number;
 

@@ -1,58 +1,15 @@
 {
-   "name": "mo-api-template",
-   "version": "5.1.0",
-   "description": "admin-panel-skeleton",
-   "scripts": {
-      "tsc": "tsc",
-      "dev": "ts-node-dev --respawn --transpileOnly ./src/app.ts",
-      "tslint": "node_modules/.bin/eslint --ext .ts ./src/",
-      "start": "cd public && node ./src/app.js",
-      "start:prod": "cd public && pm2 start ./src/app.js --name \"APIName\"",
-      "migrations": "node_modules/.bin/typeorm migration:run",
-      "migrations:revert": "node_modules/.bin/typeorm migration:revert",
-      "release": "git pull && yarn && tsc && pm2 restart APIName"
-   },
-   "author": "",
-   "license": "ISC",
-   "dependencies": {
-      "bcrypt": "3.0.6",
-      "crypto-js": "3.1.9-1",
-      "date-fns": "1.30.1",
-      "eslint": "5.16.0",
-      "express": "4.16.4",
-      "ip": "1.1.5",
-      "multer": "1.4.1",
-      "mysql": "2.17.1",
-      "reflect-metadata": "0.1.13",
-      "sharp": "0.22.0",
-      "ts-node-dev": "1.0.0-pre.32",
-      "typeorm": "0.2.16",
-      "typescript": "3.4.4",
-      "unescape": "1.0.1"
-   },
-   "devDependencies": {
-      "@types/crypto-js": "3.1.43",
-      "@types/express": "4.16.1",
-      "@types/node": "11.13.6",
-      "@typescript-eslint/eslint-plugin": "1.7.0",
-      "git-commit-msg": "0.3.0",
-      "pre-commit": "1.2.2"
-   },
-   "pre-commit": [
-      "tslint"
-   ],
-   "git-commit-hook": {
-      "types": [
-         "feat",
-         "fix",
-         "chore",
-         "docs",
-         "refactor",
-         "style",
-         "test",
-         "revert",
-         "merge"
-      ],
-      "lineLength": 72
-   }
+  "name": "api",
+  "description": "",
+  "type": "commonjs",
+  "scripts": {
+    "api": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register --project ./tsconfig.json ./src/app.ts",
+    "db-cleanup": "rm -rf ./public/api/db/*",
+    "release": "git pull && npm install && npm run db-cleanup && tsc && tsc-alias",
+    "start:prod": "cd public/api && pm2 start ./src/app.js --name \"APIName\""
+  },
+  "author": "",
+  "dependencies": {
+    "unescape": "1.0.1"
+  }
 }

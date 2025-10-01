@@ -80,6 +80,15 @@ module.exports = [
             'indent': ['error', 2, {
                 SwitchCase: 1
             }],
+            // Require object literals to be multiline (forces call args like fn({ ... }) to be on next lines)
+            'object-curly-newline': ['error', {
+                ObjectExpression: { minProperties: 1 },
+                ObjectPattern: { minProperties: 1 },
+                // Do not force multi-line for import/export declarations at the top of files
+                ImportDeclaration: 'never',
+                ExportDeclaration: 'never'
+            }],
+            'object-property-newline': ['error', { allowAllPropertiesOnSameLine: false }],
         },
     }
 ];

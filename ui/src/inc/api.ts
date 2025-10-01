@@ -4,16 +4,8 @@ import axios from 'axios';
 // Inc
 import { apiUrl } from './config';
 
-interface LoginRequestInterface {
-  login: string;
-  password: string;
-}
-
-interface LoginResponseInterface {
-  status: string;
-  message: string;
-  sessionToken: string;
-}
+// Interfaces
+import type { LoginRequestInterface, LoginResponseInterface } from '@shared/interfaces/login';
 
 export async function apiLogin(attributes: LoginRequestInterface): Promise<LoginResponseInterface> {
   let data: LoginResponseInterface = null;

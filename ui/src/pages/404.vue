@@ -4,15 +4,23 @@
       <header class="flex items-center justify-center py-12">
         <div class="rounded-full bg-gray-100 p-6 inline-flex items-center justify-center">
           <div class="w-20 h-20 bg-center bg-no-repeat">
-            <img :src="'/assets/images/logo.png'" class="w-full h-full object-contain">
+            <img :src="'/assets/images/logo.png'"
+              class="w-full h-full object-contain"
+            >
           </div>
         </div>
       </header>
 
       <main class="px-8 pb-12 text-center">
-        <h1 class="text-6xl font-extrabold text-gray-900">404</h1>
-        <p class="mt-4 text-lg text-gray-600">Page not found</p>
-        <p class="mt-2 text-sm text-gray-500">The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>
+        <h1 class="text-6xl font-extrabold text-gray-900">
+          404
+        </h1>
+        <p class="mt-4 text-lg text-gray-600">
+          Page not found
+        </p>
+        <p class="mt-2 text-sm text-gray-500">
+          The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
+        </p>
 
         <div class="mt-6">
           <router-link to="/"

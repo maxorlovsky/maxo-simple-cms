@@ -11,6 +11,7 @@ import { isLoggedIn } from '@src/inc/user';
 // Pages
 import '@src/pages/login.vue';
 import '@src/pages/404.vue';
+import '@src/pages/profile.vue';
 
 // 404 page
 routes.push(

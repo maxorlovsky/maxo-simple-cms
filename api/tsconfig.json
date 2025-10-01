@@ -1,17 +1,46 @@
 {
+   "extends": "../tsconfig.json",
    "compilerOptions": {
       "lib": [
-         "es5",
-         "es6"
+         "ES2022"
       ],
-      "target": "es6",
-      "module": "commonjs",
-      "moduleResolution": "node",
+      "target": "ES2022",
+      "module": "NodeNext",
+      "moduleResolution": "NodeNext",
+      "baseUrl": ".",
+      "rootDirs": [
+         "..",
+         "shared"
+      ],
       "outDir": "./public",
+      "paths": {
+         "@entity/*": ["./db/entity/*"],
+         "@src/*": ["./src/*"],
+         "@helpers/*": ["./src/helpers/*"],
+         "@inc/*": ["./src/inc/*"],
+         "@modules/*": ["./src/modules/*"],
+         "@routes/*": ["./src/routes/*"],
+         "@shared/*": ["../shared/*"],
+         "@prisma/*": ["./generated/prisma/*"]
+      },
       "emitDecoratorMetadata": true,
       "experimentalDecorators": true,
       "allowSyntheticDefaultImports": true,
       "sourceMap": true,
-      "resolveJsonModule": true
-   }
+      "resolveJsonModule": true,
+      "skipLibCheck": true,
+      "disableReferencedProjectLoad": true,
+      "disableSolutionSearching": true
+   },
+   "ts-node": {
+      "transpileOnly": true,
+      "require": ["tsconfig-paths/register"],
+   },
+   "include": [
+      "./src/**/*.ts",
+      "./db/**/*.ts",
+   ],
+   "exclude": [
+      "./api/src/**/*.json",
+   ]
 }
