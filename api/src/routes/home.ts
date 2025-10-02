@@ -1,4 +1,5 @@
-import * as express from 'express';
+// 3rd party libs
+import express from 'express';
 
 // Define router
 const router: express.Router = express.Router();

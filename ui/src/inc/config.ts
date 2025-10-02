@@ -7,7 +7,7 @@ export const serverUrl: string = import.meta.env.PROD ? 'https://your-prod-url-t
 export const apiUrl: string = '/maxo-simple-cms-api';
 export const environment: string = import.meta.env.PROD ? 'prod' : 'dev';
 export const version = ref<string>('0.0.0');
-export const multiBrands = ref<boolean>(false);
+export const projectName = ref<string>('');
 
 /**
  * Lazy-loads ../../../config.json and updates exported `version`.
@@ -26,8 +26,8 @@ export async function loadConfig(): Promise<void> {
       version.value = String(cfg.version);
     }
 
-    if (cfg.multiBrands) {
-      multiBrands.value = Boolean(cfg.multiBrands);
+    if (cfg.title) {
+      projectName.value = String(cfg.title);
     }
   } catch (error) {
     // fail silently in production; warn in dev for debugging

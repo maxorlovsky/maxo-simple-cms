@@ -6,7 +6,6 @@ import { AdminInterface } from './admins';
 
 export interface RequestInterface extends Request {
     isLogged: boolean;
-    siteId: number;
     user?: AdminInterface;
     file?: string[];
     files?: string[][];

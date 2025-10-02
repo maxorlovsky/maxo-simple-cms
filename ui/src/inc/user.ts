@@ -3,7 +3,15 @@ import axios from 'axios';
 import { ref } from 'vue';
 
 // Inc
-import { apiUrl, multiBrands } from './config';
+import router from '@src/router';
+import { apiUrl } from './config';
+import { apiAuthenticate } from './api';
+
+// Utilities
+import { functions } from '@src/utils/functions';
+
+// Interfaces
+import { AdminInterface } from '@shared/interfaces/admins';
 
 export const isLoggedIn = ref(false);
 
@@ -13,8 +21,29 @@ export function setIsLoggedIn(value: boolean) {
 
 export const userData = ref(null);
 
-export function setUserData(value: boolean) {
+export function setUserData(value: AdminInterface) {
   userData.value = value;
+}
+
+export async function logout() {
+  // Removing token from local storage
+  functions.storage('remove', 'token');
+
+  // Setting user as logged out
+  isLoggedIn.value = false;
+  userData.value = null;
+
+  // We trigger API call, but don't care about response
+  try {
+    await axios.post(`${apiUrl}/private/logout`);
+    // eslint-disable-next-line
+  } catch (error) {}
+
+  // Removing default header
+  delete axios.defaults.headers.common.sessionToken;
+
+  // Redirect to login page
+  router.push('/');
 }
 
 export async function authorization(value: any): Promise<any> {
@@ -22,25 +51,7 @@ export async function authorization(value: any): Promise<any> {
     // Add JWT token as default header
     axios.defaults.headers.common.sessionToken = value.token;
 
-    const axiosEndpoints = [axios.get(`${apiUrl}/me`)];
-
-    // In case website need to support multibrands, run mutlisite API call as well
-    if (multiBrands) {
-      axiosEndpoints.push(axios.get(`${apiUrl}/multisite`));
-    }
-
-    const response = await axios.all(axiosEndpoints);
-
-    // Specifying as loggedIn, to check info in router beforeEach
-    isLoggedIn.value = true;
-
-    // Saving user data
-    userData.value = response[0].data;
-
-    // Saving multisite data
-    if (multiBrands) {
-      //context.commit('saveMultiSite', response[1].data);
-    }
+    await apiAuthenticate();
   } catch (error) {
     console.error('Error fetching resources: ' + error);
 

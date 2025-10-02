@@ -97,7 +97,6 @@
 <script setup lang="ts">
 // 3rd party libs
 import { ref, reactive } from 'vue';
-import { useRouter } from 'vue-router';
 
 // Inc
 import { version, routes } from '@src/inc/config';
@@ -106,7 +105,7 @@ import { apiLogin } from '@src/inc/api';
 // Utils
 import { functions } from '@src/utils/functions';
 
-const router = useRouter();
+const emits = defineEmits(['login-success']);
 
 const buttonLoading = ref(false);
 const form = reactive({
@@ -150,8 +149,7 @@ async function submitForm() {
   // 7 days
   functions.storage('set', 'token', loginResponse.sessionToken, 604800000);
 
-  // Trigger emit that login is successful
-  router.push('/profile');
+  emits('login-success');
 }
 </script>
 

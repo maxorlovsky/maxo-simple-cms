@@ -12,7 +12,6 @@ import cors from '@inc/cors';
 
 // Middlewares
 import authMiddleware from './middleware/auth';
-import multisiteMiddleware from './middleware/multisite';
 
 // Helpers
 import { publicPath } from '@helpers/general';
@@ -21,11 +20,10 @@ import { publicPath } from '@helpers/general';
 import loginRoutes from './routes/login';
 /*import adminsRoutes from './routes/admins';
 import labelsRoutes from './routes/labels';
-import logoutRoutes from './routes/logout';
 import logsRoutes from './routes/logs';
 import pagesRoutes from './routes/pages';
-import permissionsRoutes from './routes/permissions';
-import userDataRoutes from './routes/user-data';*/
+import permissionsRoutes from './routes/permissions';*/
+import userDataRoutes from './routes/user-data';
 import homeRoutes from './routes/home';
 
 // Create a new express application instance
@@ -46,8 +44,7 @@ app.use('/', apiLimiter);
 app.use(express.json());
 
 // Apply middleware
-app.use('/', authMiddleware);
-app.use('/', multisiteMiddleware);
+app.use('/private', authMiddleware);
 
 // Define static files
 app.use(express.static(publicPath));
@@ -56,11 +53,10 @@ app.use(express.static(publicPath));
 app.use('/', loginRoutes);
 /*app.use('/', adminsRoutes);
 app.use('/', labelsRoutes);
-app.use('/', logoutRoutes);
 app.use('/', logsRoutes);
 app.use('/', pagesRoutes);
-app.use('/', permissionsRoutes);
-app.use('/', userDataRoutes);*/
+app.use('/', permissionsRoutes);*/
+app.use('/private', userDataRoutes);
 app.use('/', homeRoutes);
 
 // Creating an event to watch if database finished loading, until then we just reloop every 2 seconds

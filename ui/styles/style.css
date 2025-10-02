@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-body {
+.maxo-simple-cms-background {
   background-image: url('/assets/images/tree.png');
   background-repeat: no-repeat;
   background-position: 0 100%;

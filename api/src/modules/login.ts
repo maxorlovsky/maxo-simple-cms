@@ -97,7 +97,7 @@ export default class Login {
     return convertedSessionToken;
   }
 
-  private async cleanAuth(user: MoAdminsInterface): Promise<boolean> {
+  public async cleanAuth(user: MoAdminsInterface): Promise<boolean> {
     try {
       await prisma.mo_users_auth.deleteMany({
         where: {

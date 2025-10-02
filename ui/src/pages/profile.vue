@@ -1,6 +1,6 @@
 <template>
-  <section class="flex items-center justify-center min-h-screen px-4">
-    <div class="w-full max-w-lg bg-white rounded-md shadow-lg p-6">
+  <section class="py-8 px-6">
+    <div class="w-full max-w-3xl mx-auto bg-white rounded-md shadow-lg p-6">
       <h2 class="text-2xl font-semibold mb-4">
         Profile
       </h2>
@@ -12,21 +12,21 @@
           <div>
             <label class="block text-sm font-medium text-gray-700">Admin ID</label>
             <div class="mt-1 text-sm text-gray-900">
-              {{ user?.id ?? '-' }}
+              {{ userData?.id ?? '-' }}
             </div>
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-700">Admin Name</label>
             <div class="mt-1 text-sm text-gray-900">
-              {{ user?.login ?? '-' }}
+              {{ userData?.login ?? '-' }}
             </div>
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-700">Admin Level</label>
             <div class="mt-1 text-sm text-gray-900">
-              {{ user?.level ?? '-' }}
+              {{ userData?.level ?? '-' }}
             </div>
           </div>
         </div>
@@ -106,6 +106,7 @@ import { ref, reactive, computed } from 'vue';
 import axios from 'axios';
 
 import { routes, apiUrl } from '@src/inc/config';
+import { userData } from '@src/inc/user';
 
 const formLoading = ref(false);
 const form = reactive({

@@ -1,102 +1,92 @@
 <template>
-    <v-app id="app"
-        :class="bodyClass"
-        class="app"
+  <section>
+    <div v-if="appLoading"
+      class="fixed inset-0 z-50 w-full h-full bg-white/99 flex items-center justify-center"
     >
-        <v-content :class="{ 'collapsed-drawer': drawer }">
-            <header-component v-if="loggedIn" />
+      <loading />
+    </div>
+    <div v-else>
+      <template v-if="isLoggedIn">
+        <header-component />
 
-            <v-navigation-drawer v-if="loggedIn"
-                :value="drawer"
-                width="230"
-                app
-            >
-                <left-side />
-            </v-navigation-drawer>
+        <!-- Layout: sidebar (navigation) + main content -->
+        <div class="flex">
+          <navigation-component />
 
-            <router-view class="body-content" />
-        </v-content>
+          <main class="flex-1 maxo-simple-cms-background">
+            <router-view @login-success="handleLogin" />
+          </main>
+        </div>
+      </template>
 
-        <notifications position="bottom right"
-            group="general"
-        />
+      <template v-else>
+        <main class="maxo-simple-cms-background">
+          <router-view @login-success="handleLogin" />
+        </main>
+      </template>
+    </div>
 
-        <section v-if="loading"
-            class="pre-loading"
-        >
-            <loading />
-        </section>
-    </v-app>
+  </section>
 </template>
 
-<script>
-// Globals functions
-import { functions } from './functions.js';
+<script lang="ts" setup>
+// 3rd party libs
+import axios from 'axios';
+import { ref, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
-// Store
-import { store } from './store/index.js';
+// Inc
+import { apiAuthenticate } from '@src/inc/api';
+import { setIsLoggedIn, isLoggedIn } from '@src/inc/user';
+
+// Utilities
+import { functions } from '@src/utils/functions';
 
 // Components
-import headerComponent from './components/header/header.vue';
-import leftSide from './components/left-side/left-side.vue';
-import loading from './components/loading/loading.vue';
+import loading from '@src/components/loading.vue';
+import headerComponent from '@src/components/header.vue';
+import navigationComponent from '@src/components/navigation.vue';
 
-export default {
-    name: 'app',
-    store: store,
-    components: {
-        headerComponent,
-        leftSide,
-        loading
-    },
-    data() {
-        return {
-            loading: true,
-            bodyClass: mo.env
-        };
-    },
-    computed: {
-        loggedIn() {
-            return this.$store.getters.get('loggedIn');
-        },
-        drawer() {
-            return this.$store.getters.get('drawer');
-        }
-    },
-    async created() {
-        try {
-            // If user is logged in, storring in Vuex
-            if (mo.loggedIn) {
-                await this.$store.dispatch('authorization', {
-                    token: functions.storage('get', 'token')
-                });
+const route = useRoute();
+const router = useRouter();
 
-                // If store loggedIn state is true and user is on homepage, reidrect to dashboard
-                if (this.$store.getters.get('loggedIn') && this.$route.path === '/') {
-                    this.$router.push('/profile');
-                }
-            }
-        } catch (e) {
-            this.$store.dispatch('logout');
+const appLoading = ref(true);
 
-            this.$router.push('/');
+onMounted(async () => {
+  if (functions.storage('get', 'token')) {
+    await handleLogin();
+  }
 
-            console.error(e);
-        } finally {
-            this.removeLoader();
-        }
-    },
-    mounted() {
-        // If user is not logged in, display login form directly after the render
-        if (!mo.loggedIn) {
-            this.removeLoader();
-        }
-    },
-    methods: {
-        removeLoader() {
-            // Remove loader
-            this.loading = false;
-        }
+  appLoading.value = false;
+});
+
+async function handleLogin() {
+  const token = functions.storage('get', 'token');
+
+  // If token is present
+  if (token) {
+    // We set it as default header for axios
+    axios.defaults.headers.common.sessionToken = token;
+
+    const authenticationResponse = await apiAuthenticate();
+
+    if (authenticationResponse.status) {
+      // We additionaly check if user is on login page
+      if (route.path === '/') {
+        // If so, we redirect him to profile page
+        router.push('/profile');
+      }
     }
-};
+  } else {
+    setIsLoggedIn(false);
+
+    // If user is not logged in, we redirect him to login page
+    if (route.path !== '/' && route.path !== '/404') {
+      router.push('/');
+    }
+  }
+
+  // in app.vue
+  //router.push('/profile');
+}
 </script>

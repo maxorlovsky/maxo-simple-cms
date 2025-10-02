@@ -1,3 +1,5 @@
+// Interfaces
+import { AdminInterface } from './admins';
 import { GeneralResponseInterface } from './general';
 
 export interface LoginRequestInterface {
@@ -7,4 +9,8 @@ export interface LoginRequestInterface {
 
 export interface LoginResponseInterface extends GeneralResponseInterface {
   sessionToken?: string;
+}
+
+export interface MeResponseInterface extends GeneralResponseInterface {
+  user?: AdminInterface;
 }

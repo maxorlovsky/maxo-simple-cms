@@ -34,7 +34,7 @@ const functions = {
       const saveData = {
         data: args[0],
         time: new Date().getTime() + timeoutSeconds,
-        version: version
+        version: version.value
       };
 
       localStorage.setItem(key, JSON.stringify(saveData));
@@ -63,13 +63,13 @@ const functions = {
     }
 
     // If version was bumped, we might still use outdated localStorage data, doing full cleanup
-    if (localStorage.getItem('version') !== version) {
+    if (localStorage.getItem('version') !== version.value) {
       for (const value of storagesKeys) {
         localStorage.removeItem(value);
       }
 
       // Saving version to not cleaup everything again until the next bump
-      localStorage.setItem('version', version);
+      localStorage.setItem('version', version.value);
     }
 
     return true;

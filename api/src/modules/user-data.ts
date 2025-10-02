@@ -1,169 +1,144 @@
-// 3rd party libs
-import { getConnection } from 'typeorm';
-import SharedComponents from '../shared-components';
-
-// Config
-import * as config from '../inc/config.json';
+// Inc
+import { prisma } from '@inc/db';
+//import * as config from '../inc/config.json';
 
 // Modules
-import Login from './login';
-import Admins from './admins';
-
-// Interfaces
-import { AdminInterface } from '../interfaces/admins';
-import { PasswordFormInterface, MultisiteInterface, MenuInterface } from '../interfaces/user-data';
+//import Login from './login';
+//import Admins from './admins';
 
 // Entities
-import { Mo } from '../../db/entity/mo';
+/*import { Mo } from '../../db/entity/mo';
 import { MoMultisite } from '../../db/entity/moMultisite';
-import { MoAdmins } from '../../db/entity/moAdmins';
+import { MoAdmins } from '../../db/entity/moAdmins';*/
 
-export default class UserData extends SharedComponents {
-    private user: AdminInterface;
+// Interfaces
+//import { PasswordFormInterface, MultisiteInterface } from '../interfaces/user-data';
+import { MenuInterface } from '@src/interfaces/user-data';
+import { AdminInterface } from '@shared/interfaces/admins';
 
-    constructor(user) {
-        super();
+export default class UserData {
+  public async fetchMenu(user: AdminInterface): Promise<MenuInterface[]> {
+    // Fetching menu json from database (Prisma)
+    const dbMenu = await prisma.mo.findFirst({
+      where: {
+        setting: 'menu'
+      }
+    });
 
-        this.user = user;
+    if (!dbMenu || !dbMenu.value) {
+      return [];
     }
 
-    public fetchAdminData(): AdminInterface | null {
-        if (!this.user) {
-            return null;
-        }
+    // Converting menu to proper json
+    let jsonMenu: any[] = [];
 
-        return this.user;
+    try {
+      jsonMenu = JSON.parse(dbMenu.value);
+    } catch (err) {
+      // If parsing fails, return empty menu
+      console.error('Failed to parse menu JSON:', err);
+
+      return [];
     }
 
-    public async fetchMenu(): Promise<Array<MenuInterface>> {
-        // Fetching menu json from database
-        const menu = await getConnection().getRepository(Mo)
-            .findOne({
-                setting: 'menu'
-            });
+    const returnMenu: MenuInterface[] = [];
 
-        // Converting menu to proper json
-        const jsonMenu = JSON.parse(menu.value);
+    for (const m of jsonMenu) {
+      // Check if user level is allowing him to access the page
+      if (m.level <= user.level || (user.level === 0 && Array.isArray(user.customAccess) && user.customAccess.indexOf(m.key) >= 0)) {
+        const menuItem: any = {
+          url: `/${m.key}`,
+          title: m.name,
+          icon: m.iconClasses
+        };
 
-        const returnMenu = [];
+        // Check if there are subpages
+        if (m.subCategories && m.subCategories.length) {
+          menuItem.sublinks = [];
 
-        for (const menu of jsonMenu) {
-            // Check if user level is allowing him to access the page, if not, removing it from navigation
-            if (menu.level <= this.user.level || (this.user.level === 0 && this.user.customAccess.indexOf(menu.key) >= 0)) {
-                returnMenu.push({
-                    url: `/${menu.key}`,
-                    title: menu.name,
-                    icon: menu.iconClasses
-                });
-
-                // Check if there is subpages
-                if (menu.subCategories.length) {
-                    const index = returnMenu.length - 1;
-
-                    returnMenu[index].sublinks = [];
-
-                    for (const subMenu of menu.subCategories) {
-                        // Check if user level is allowing him to access the sub page, if not, removing it from navigation
-                        if (subMenu.level <= this.user.level || (this.user.level === 0 && this.user.customAccess.indexOf(subMenu.key) >= 0)) {
-                            returnMenu[index].sublinks.push({
-                                url: `/${subMenu.key}`,
-                                title: subMenu.name,
-                                icon: subMenu.iconClasses
-                            });
-                        }
-                    }
-                }
+          for (const subMenu of m.subCategories) {
+            // Check if user level is allowing access to the sub page
+            if (subMenu.level <= user.level || (user.level === 0 && Array.isArray(user.customAccess) && user.customAccess.indexOf(subMenu.key) >= 0)) {
+              menuItem.sublinks.push({
+                url: `/${subMenu.key}`,
+                title: subMenu.name,
+                icon: subMenu.iconClasses
+              });
             }
+          }
         }
 
-        return returnMenu;
+        returnMenu.push(menuItem);
+      }
     }
 
-    public async fetchMultisites(): Promise<Array<MultisiteInterface>> {
-        // Fetching multisites from database
-        const multisites = await getConnection().getRepository(MoMultisite).find();
+    return returnMenu;
+  }
 
-        // If not found, returning false
-        if (!multisites.length) {
-            return [];
-        }
-
-        const gatherMultisites = [];
-
-        for (const site of multisites) {
-            gatherMultisites.push({
-                id: site.id,
-                name: site.name
-            });
-        }
-
-        return gatherMultisites;
+  /*public async updatePassword(attributes: PasswordFormInterface): Promise<boolean> {
+    if (!await this.checkFormPassword(attributes)) {
+      return false;
     }
 
-    public async updatePassword(attributes: PasswordFormInterface): Promise<boolean> {
-        if (!await this.checkFormPassword(attributes)) {
-            return false;
-        }
+    try {
+      const admin = await getConnection().getRepository(MoAdmins)
+        .findOne({
+          id: this.user.id
+        });
 
-        try {
-            const admin = await getConnection().getRepository(MoAdmins)
-                .findOne({
-                    id: this.user.id
-                });
+      admin.password = await Admins.passwordConvert(attributes.newPass);
 
-            admin.password = await Admins.passwordConvert(attributes.newPass);
+      await getConnection().getRepository(MoAdmins).save(admin);
+    } catch (error) {
+      console.error(error);
 
-            await getConnection().getRepository(MoAdmins).save(admin);
-        } catch (error) {
-            console.error(error);
-
-            return false;
-        }
-
-        return true;
+      return false;
     }
 
-    private async checkFormPassword(attributes: PasswordFormInterface): Promise<boolean> {
-        if (!attributes.currentPass) {
-            this.message += 'Current Password is empty<br />';
-            this.fields.push('currentPass');
-        }
+    return true;
+  }
 
-        if (!attributes.newPass) {
-            this.message += 'New Password is empty<br />';
-            this.fields.push('newPass');
-        }
-
-        if (!attributes.repeatPass) {
-            this.message += 'Repeat Password is empty<br />';
-            this.fields.push('repeatPass');
-        }
-
-        if (attributes.newPass.length < config.minPasswordLength) {
-            this.message += `New Password must be at least ${config.minPasswordLength} characters long<br />`;
-            this.fields.push('newPass');
-        }
-
-        if (attributes.newPass !== attributes.repeatPass) {
-            this.message += 'Passwords does not match<br />';
-            this.fields.push('repeatPass');
-        }
-
-        const checkPassword = await getConnection().getRepository(MoAdmins)
-            .findOne({
-                id: this.user.id
-            });
-
-        if (!await Login.passwordVerify(attributes.currentPass, checkPassword.password.replace('$2y$', '$2a$'))) {
-            this.message += 'Current password is incorrect<br />';
-            this.fields.push('currentPass');
-        }
-
-        // In case if there are any messages, return false
-        if (this.message) {
-            return false;
-        }
-
-        return true;
+  private async checkFormPassword(attributes: PasswordFormInterface): Promise<boolean> {
+    if (!attributes.currentPass) {
+      this.message += 'Current Password is empty<br />';
+      this.fields.push('currentPass');
     }
+
+    if (!attributes.newPass) {
+      this.message += 'New Password is empty<br />';
+      this.fields.push('newPass');
+    }
+
+    if (!attributes.repeatPass) {
+      this.message += 'Repeat Password is empty<br />';
+      this.fields.push('repeatPass');
+    }
+
+    if (attributes.newPass.length < config.minPasswordLength) {
+      this.message += `New Password must be at least ${config.minPasswordLength} characters long<br />`;
+      this.fields.push('newPass');
+    }
+
+    if (attributes.newPass !== attributes.repeatPass) {
+      this.message += 'Passwords does not match<br />';
+      this.fields.push('repeatPass');
+    }
+
+    const checkPassword = await getConnection().getRepository(MoAdmins)
+      .findOne({
+        id: this.user.id
+      });
+
+    if (!await Login.passwordVerify(attributes.currentPass, checkPassword.password.replace('$2y$', '$2a$'))) {
+      this.message += 'Current password is incorrect<br />';
+      this.fields.push('currentPass');
+    }
+
+    // In case if there are any messages, return false
+    if (this.message) {
+      return false;
+    }
+
+    return true;
+  }*/
 }

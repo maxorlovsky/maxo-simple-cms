@@ -5,9 +5,6 @@ import { createRouter, createWebHistory } from 'vue-router';
 import { routes } from '@src/inc/config';
 import { isLoggedIn } from '@src/inc/user';
 
-// Utils
-//import { apiAuthenticate } from '@utils/api';
-
 // Pages
 import '@src/pages/login.vue';
 import '@src/pages/404.vue';
@@ -29,28 +26,11 @@ const router = createRouter({
 
 // @ts-ignore
 router.beforeEach(async (to, from, next) => {
-  // Check if authentication verification is needed
-  if (!isLoggedIn.value) {
-    // In case user is not logged in, we first try to authenticate him
-    /*const authenticationResponse = await apiAuthenticate();
-
-    // If authentication failed, we need to redirect to the home page
-    if (!authenticationResponse) {
-        console.error('Authentication failure');
-
-        // If not logged in, we need to redirect to the home page
-        return next('/');
-    }*/
-
-    // We second check if now user is logged in, this should not happen, as otherwise authentication should fail in the first place, but we safeguard it
-    if (!isLoggedIn.value) {
-      console.error('Authentication failure (2)');
-
-      // If not logged in, we need to redirect to the home page
-      if (to.path !== '/' && to.path !== '/404') {
-        return next('/');
-      }
-    }
+  // We see if user is logged in, but try to access home page, then we redirect to profile
+  if (isLoggedIn.value && to.path === '/') {
+    return next('/profile');
+  } else if (!isLoggedIn.value && to.path !== '/' && to.path !== '/404') {
+    return next('/');
   }
 
   window.scrollTo(0, 0);
