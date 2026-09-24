@@ -9,12 +9,11 @@
         >
           <!-- simple link -->
           <div v-if="!item.sublinks">
-            <!-- If item has a URL render a router-link, otherwise render a non-navigating block that is still hoverable -->
             <template v-if="item.url">
               <router-link :to="item.url"
-                class="w-full flex items-center gap-3 p-2 rounded hover:bg-gray-50 hover:text-indigo-600 hover:border-l-4 hover:border-indigo-500 cursor-pointer"
+                :class="['w-full flex items-center gap-3 p-2 rounded hover:bg-gray-50 hover:text-indigo-600 hover:border-l-4 hover:border-indigo-500 cursor-pointer', isActive(item.url) ? 'bg-indigo-50 text-indigo-700 border-l-4 border-indigo-500 font-medium' : '']"
               >
-                <span class="text-gray-800">{{ item.title }}</span>
+                <span>{{ item.title }}</span>
               </router-link>
             </template>
 
@@ -30,11 +29,11 @@
 
           <!-- item with sublinks -->
           <div v-else>
-            <button class="w-full flex items-center justify-between p-2 rounded hover:bg-gray-50 hover:text-indigo-600 hover:border-l-4 hover:border-indigo-500 cursor-pointer"
+            <button :class="['w-full flex items-center justify-between p-2 rounded hover:bg-gray-50 hover:text-indigo-600 hover:border-l-4 hover:border-indigo-500 cursor-pointer', isItemActive(item) ? 'bg-indigo-50 text-indigo-700 border-l-4 border-indigo-500 font-medium' : '']"
               @click="toggleItem(item)"
             >
               <div class="flex items-center gap-3">
-                <span class="text-gray-800">{{ item.title }}</span>
+                <span>{{ item.title }}</span>
               </div>
               <span class="text-gray-500">{{ item.active ? '-' : '+' }}</span>
             </button>
@@ -47,9 +46,9 @@
               >
                 <template v-if="subitem.url">
                   <router-link :to="subitem.url"
-                    class="w-full flex items-center gap-3 p-2 rounded hover:bg-gray-50 hover:text-indigo-600 hover:border-l-4 hover:border-indigo-500"
+                    :class="['w-full flex items-center gap-3 p-2 rounded hover:bg-gray-50 hover:text-indigo-600 hover:border-l-4 hover:border-indigo-500', isActive(subitem.url) ? 'bg-indigo-50 text-indigo-700 border-l-4 border-indigo-500 font-medium' : '']"
                   >
-                    <span class="text-gray-700">{{ subitem.title }}</span>
+                    <span>{{ subitem.title }}</span>
                   </router-link>
                 </template>
 
@@ -94,10 +93,10 @@
             <div v-if="!item.sublinks">
               <template v-if="item.url">
                 <router-link :to="item.url"
-                  class="w-full flex items-center gap-3 p-2 rounded hover:bg-gray-50 hover:text-indigo-600 hover:border-l-4 hover:border-indigo-500"
+                  :class="['w-full flex items-center gap-3 p-2 rounded hover:bg-gray-50 hover:text-indigo-600 hover:border-l-4 hover:border-indigo-500', isActive(item.url) ? 'bg-indigo-50 text-indigo-700 border-l-4 border-indigo-500 font-medium' : '']"
                   @click="setIsMobileOpen(false)"
                 >
-                  <span class="text-gray-800">{{ item.title }}</span>
+                  <span>{{ item.title }}</span>
                 </router-link>
               </template>
 
@@ -113,11 +112,11 @@
             </div>
 
             <div v-else>
-              <button class="w-full flex items-center justify-between p-2 rounded hover:bg-gray-50 hover:text-indigo-600 hover:border-l-4 hover:border-indigo-500 cursor-pointer"
+              <button :class="['w-full flex items-center justify-between p-2 rounded hover:bg-gray-50 hover:text-indigo-600 hover:border-l-4 hover:border-indigo-500 cursor-pointer', isItemActive(item) ? 'bg-indigo-50 text-indigo-700 border-l-4 border-indigo-500 font-medium' : '']"
                 @click="toggleItem(item)"
               >
                 <div class="flex items-center gap-3">
-                  <span class="text-gray-800">{{ item.title }}</span>
+                  <span>{{ item.title }}</span>
                 </div>
                 <span class="text-gray-500">{{ item.active ? '-' : '+' }}</span>
               </button>
@@ -130,10 +129,10 @@
                 >
                   <template v-if="subitem.url">
                     <router-link :to="subitem.url"
-                      class="w-full flex items-center gap-3 p-2 rounded hover:bg-gray-50 hover:text-indigo-600 hover:border-l-4 hover:border-indigo-500"
+                      :class="['w-full flex items-center gap-3 p-2 rounded hover:bg-gray-50 hover:text-indigo-600 hover:border-l-4 hover:border-indigo-500', isActive(subitem.url) ? 'bg-indigo-50 text-indigo-700 border-l-4 border-indigo-500 font-medium' : '']"
                       @click="setIsMobileOpen(false)"
                     >
-                      <span class="text-gray-700">{{ subitem.title }}</span>
+                      <span>{{ subitem.title }}</span>
                     </router-link>
                   </template>
 
@@ -204,6 +203,27 @@ function setActiveFromRoute() {
 
 function toggleItem(item: any) {
   item.active = !item.active;
+}
+
+// New helpers for active link styling
+function isActive(url: string) {
+  if (!url) return false;
+  try {
+    return route.path === url || route.path.startsWith(url + '/') || route.path.startsWith(url);
+    // eslint-disable-next-line
+  } catch (error) {
+    return false;
+  }
+}
+
+function isItemActive(item: any) {
+  if (!item) return false;
+
+  if (item.sublinks && Array.isArray(item.sublinks)) {
+    return item.sublinks.some((s: any) => isActive(s.url));
+  }
+
+  return isActive(item.url);
 }
 </script>
 

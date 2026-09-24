@@ -2,10 +2,10 @@
 import express from 'express';
 
 // Logger
-import { log } from '../inc/log';
+import { log } from '@inc/log';
 
 // Modules
-import UserDataModule from '../modules/user-data';
+import UserDataModule from '@modules/user-data';
 
 // Interfaces
 import { RequestInterface } from '@shared/interfaces/routing';

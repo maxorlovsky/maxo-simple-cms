@@ -3,7 +3,7 @@ import { prisma } from '@inc/db';
 //import * as config from '../inc/config.json';
 
 // Modules
-//import Login from './login';
+import LoginModule from './login';
 //import Admins from './admins';
 
 // Entities
@@ -17,6 +17,8 @@ import { MenuInterface } from '@src/interfaces/user-data';
 import { AdminInterface } from '@shared/interfaces/admins';
 
 export default class UserData {
+  private loginModule = new LoginModule();
+
   public async fetchMenu(user: AdminInterface): Promise<MenuInterface[]> {
     // Fetching menu json from database (Prisma)
     const dbMenu = await prisma.mo.findFirst({
@@ -73,6 +75,28 @@ export default class UserData {
     }
 
     return returnMenu;
+  }
+
+  public async logout(user: AdminInterface): Promise<void> {
+    // In case user is empty we do nothing
+    if (!user || !user.id) {
+      return;
+    }
+
+    // Otherwise we're fetching user from database
+    const admin = await prisma.mo_admins.findUnique({
+      where: {
+        id: user.id
+      }
+    });
+
+    if (!admin) {
+      return;
+    }
+
+    await this.loginModule.cleanAuth(admin);
+
+    return;
   }
 
   /*public async updatePassword(attributes: PasswordFormInterface): Promise<boolean> {

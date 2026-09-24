@@ -1,79 +1,88 @@
-// 3rd party libs
-import { getConnection } from 'typeorm';
-
-// Classes
-import SharedComponents from '../shared-components';
+// Inc
+import { prisma } from '@inc/db';
 
 // Interfaces
 import { PermissionsFormInterface } from '../interfaces/permissions';
+import { GeneralResponseInterface } from '@shared/interfaces/general';
 
-// Entities
-import { Mo } from '../../db/entity/mo';
+export default class Permissions {
+  public async getPermissions(): Promise<string[]> {
+    let returnPermissions = [];
 
-export default class Permissions extends SharedComponents {
-
-    public async getPermissions(): Promise<Array<string>> {
-        let returnPermissions = [];
-
-        try {
-            // Fetching previous attempts to login
-            const permissions = await getConnection().getRepository(Mo)
-                .findOne({
-                    setting: 'menu'
-                });
-
-            if (permissions) {
-                returnPermissions = JSON.parse(permissions.value);
-            }
-        } catch (error) {
-            console.error(error);
+    try {
+      // Fetch menu row using Prisma
+      const permissions = await prisma.mo.findFirst({
+        where: {
+          setting: 'menu'
         }
+      });
 
-        return returnPermissions;
+      if (permissions) {
+        returnPermissions = JSON.parse(permissions.value);
+      }
+    } catch (error) {
+      console.error(error);
     }
 
-    public async updatePermissions(attributes: Array<PermissionsFormInterface>): Promise<boolean> {
-        const formData = await this.checkForm(attributes);
+    return returnPermissions;
+  }
 
-        if (!formData) {
-            return false;
-        }
+  public async updatePermissions(attributes: PermissionsFormInterface[]): Promise<GeneralResponseInterface> {
+    const formData = this.checkForm(attributes);
 
-        try {
-            const permissions = await getConnection().getRepository(Mo)
-                .findOne({
-                    setting: 'menu'
-                });
-
-            permissions.value = JSON.stringify(attributes);
-
-            await getConnection().getRepository(Mo).save(permissions);
-        } catch (error) {
-            console.error(error);
-
-            return false;
-        }
-
-        return true;
+    if (formData) {
+      return {
+        status: false,
+        message: formData
+      };
     }
 
-    private checkForm(attributes: Array<PermissionsFormInterface>): boolean {
-        for (const attribute of attributes) {
-            if (!attribute.name) {
-                this.message += `${attribute.key.charAt(0).toUpperCase()}${attribute.key.slice(1)} name is empty<br />`;
-                this.fields.push(attribute.key);
-            }
-
-            if (!attribute.level) {
-                this.message += `${attribute.key.charAt(0).toUpperCase()}${attribute.key.slice(1)} level is empty<br />`;
-                this.fields.push(attribute.key);
-            }
+    try {
+      // Try to update existing row; if none exists, create it
+      const updated = await prisma.mo.updateMany({
+        where: {
+          setting: 'menu'
+        },
+        data: {
+          value: JSON.stringify(attributes)
         }
+      });
 
-        if (this.message) {
-            return false;
-        }
+      if (updated.count === 0) {
+        await prisma.mo.create({
+          data: {
+            setting: 'menu',
+            value: JSON.stringify(attributes)
+          }
+        });
+      }
+    } catch (error) {
+      console.error(error);
 
-        return true;
+      return {
+        status: false,
+        message: 'Database error, could not update permissions'
+      };
     }
+
+    return {
+      status: true,
+    };
+  }
+
+  private checkForm(attributes: Array<PermissionsFormInterface>): string {
+    let message = '';
+
+    for (const attribute of attributes) {
+      if (!attribute.name) {
+        message += `${attribute.key.charAt(0).toUpperCase()}${attribute.key.slice(1)} name is empty<br />`;
+      }
+
+      if (!attribute.level) {
+        message += `${attribute.key.charAt(0).toUpperCase()}${attribute.key.slice(1)} level is empty<br />`;
+      }
+    }
+
+    return message;
+  }
 }
