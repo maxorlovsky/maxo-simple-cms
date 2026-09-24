@@ -5,7 +5,7 @@ import express from 'express';
 import { log } from '@inc/log';
 
 // Modules
-import LoginModule from '../modules/login';
+import LoginModule from '@modules/login';
 
 // Helpers
 import { sanitizeString } from '@src/helpers/sanitize';

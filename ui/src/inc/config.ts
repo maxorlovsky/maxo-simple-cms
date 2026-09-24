@@ -8,6 +8,7 @@ export const apiUrl: string = '/maxo-simple-cms-api';
 export const environment: string = import.meta.env.PROD ? 'prod' : 'dev';
 export const version = ref<string>('0.0.0');
 export const projectName = ref<string>('');
+export const maxLevel = ref<number>(1);
 
 /**
  * Lazy-loads ../../../config.json and updates exported `version`.
@@ -28,6 +29,10 @@ export async function loadConfig(): Promise<void> {
 
     if (cfg.title) {
       projectName.value = String(cfg.title);
+    }
+
+    if (cfg.maxLevel) {
+      maxLevel.value = Number(cfg.maxLevel);
     }
   } catch (error) {
     // fail silently in production; warn in dev for debugging

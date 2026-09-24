@@ -26,13 +26,6 @@ export function setUserData(value: AdminInterface) {
 }
 
 export async function logout() {
-  // Removing token from local storage
-  functions.storage('remove', 'token');
-
-  // Setting user as logged out
-  isLoggedIn.value = false;
-  userData.value = null;
-
   // We trigger API call, but don't care about response
   try {
     await axios.post(`${apiUrl}/private/logout`);
@@ -42,19 +35,24 @@ export async function logout() {
   // Removing default header
   delete axios.defaults.headers.common.sessionToken;
 
+  // Removing token from local storage
+  functions.storage('remove', 'token');
+
+  // Setting user as logged out
+  isLoggedIn.value = false;
+  userData.value = null;
+
   // Redirect to login page
   router.push('/');
 }
 
-export async function authorization(value: any): Promise<any> {
+export async function authorization(token: string): Promise<any> {
   try {
     // Add JWT token as default header
-    axios.defaults.headers.common.sessionToken = value.token;
+    axios.defaults.headers.common.sessionToken = token;
 
     await apiAuthenticate();
   } catch (error) {
     console.error('Error fetching resources: ' + error);
-
-    // Triggering the logout
   }
 };

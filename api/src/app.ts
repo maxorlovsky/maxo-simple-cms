@@ -21,8 +21,8 @@ import loginRoutes from './routes/login';
 /*import adminsRoutes from './routes/admins';
 import labelsRoutes from './routes/labels';
 import logsRoutes from './routes/logs';
-import pagesRoutes from './routes/pages';
-import permissionsRoutes from './routes/permissions';*/
+import pagesRoutes from './routes/pages';*/
+import permissionsRoutes from './routes/permissions';
 import userDataRoutes from './routes/user-data';
 import homeRoutes from './routes/home';
 
@@ -54,8 +54,8 @@ app.use('/', loginRoutes);
 /*app.use('/', adminsRoutes);
 app.use('/', labelsRoutes);
 app.use('/', logsRoutes);
-app.use('/', pagesRoutes);
-app.use('/', permissionsRoutes);*/
+app.use('/', pagesRoutes);*/
+app.use('/private', permissionsRoutes);
 app.use('/private', userDataRoutes);
 app.use('/', homeRoutes);
 
