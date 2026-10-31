@@ -36,7 +36,7 @@
     "eslint": "9.36.0",
     "eslint-plugin-vue": "9.33.0",
     "express": "5.1.0",
-    "express-rate-limit": "8.1.0",
+    "express-rate-limit": "8.7.2",
     "floating-vue": "5.2.2",
     "ip": "^2.0.1",
     "reflect-metadata": "0.2.2",
